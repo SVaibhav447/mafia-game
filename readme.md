@@ -10,4 +10,5 @@ backend/  - Node server
 
 ## Setup
 cd frontend && npm install
+
 cd backend && npm install
