@@ -1,14 +1,16 @@
 # Mafia Game
 
-## Tech Stack
-Frontend: React
-Backend: Express + Socket.io
-
-## Project Structure
-frontend/ - React client
-backend/  - Node server
-
 ## Setup
-cd frontend && npm install
 
-cd backend && npm install
+### Backend
+cd backend
+npm install
+npm run dev
+
+### Frontend
+cd frontend
+npm install
+npm run dev
+
+## Run game locally
+Open multiple tabs at http://localhost:3000

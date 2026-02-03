@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mafia Test Actions</title>
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+</head>
+<body>
+<h3>Mafia Game Test</h3>
+<script>
+  const socket = io("http://localhost:3001");
+
+  socket.on("connect", () => {
+    console.log("connected:", socket.id);
+
+    // SIMULATE: Create room as host Alice
+    socket.emit("createRoom", { roomCode: "TEST", hostName: "Alice" });
+  });
+
+  socket.on("roomUpdate", (room) => {
+    console.log("roomUpdate:", room);
+  });
+
+  socket.on("roleReveal", (data) => {
+    console.log("role:", data.role);
+  });
+
+  socket.on("phaseChange", (data) => {
+    console.log("phaseChange:", data);
+  });
+
+  socket.on("dayReveal", (data) => {
+    console.log("dayReveal:", data);
+  });
+
+  socket.on("lynchResult", (data) => {
+    console.log("lynchResult:", data);
+  });
+
+  socket.on("gameOver", (data) => {
+    console.log("GAME OVER:", data);
+  });
+</script>
+</body>
+</html>
