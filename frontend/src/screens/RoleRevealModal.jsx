@@ -25,7 +25,7 @@ export default function RoleRevealModal() {
 
   return (
     <div className="role-reveal-modal">
-     <div className="role-reveal-overlay" />
+      <div className="role-reveal-overlay" />
       <div className="role-reveal-content" style={{ borderColor: info.color }}>
         <h1 className="role-title" style={{ color: info.color }}>
           {info.title}
