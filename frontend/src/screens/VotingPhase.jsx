@@ -76,6 +76,7 @@ export default function VotingPhase() {
         players={players}
         onPlayerClick={amAlive ? handlePlayerClick : undefined}
         selectedId={selected}
+        shuffleSeed={useGameState(s => s.shuffleSeed)}
       />
 
       {amAlive && (

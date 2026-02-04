@@ -1,4 +1,5 @@
 const rooms = {};
+const crypto = require("crypto");
 
 function createRoom(roomCode, hostId, hostName) {
   if (rooms[roomCode]) return { error: "ROOM_EXISTS" };
@@ -8,6 +9,7 @@ function createRoom(roomCode, hostId, hostName) {
     hostId,
     status: "lobby",
     players: [],
+    shuffleSeed: crypto.randomInt(1, 2147483647),
     state: { 
       phase: "lobby", 
       round: 0,

@@ -4,6 +4,7 @@ import PlayerGrid from "../components/PlayerGrid";
 
 export default function EndgameScreen() {
   const { winner, me, players, roomCode, hostId } = useGameState();
+    const shuffleSeed = useGameState(s => s.shuffleSeed);  // ✅ HERE
 
   function restart() {
     gameSocket.emit("resetGame", { roomCode });
@@ -19,7 +20,7 @@ export default function EndgameScreen() {
         </h1>
       </div>
 
-      <PlayerGrid players={players} showRoles={true} />
+      <PlayerGrid players={players} showRoles={true} shuffleSeed={shuffleSeed} />
 
       <div className="endgame-controls">
         {isHost ? (

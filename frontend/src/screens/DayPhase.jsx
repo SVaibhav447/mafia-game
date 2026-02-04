@@ -4,14 +4,18 @@ import { gameSocket } from "../core/socket";
 import PlayerGrid from "../components/PlayerGrid";
 
 export default function DayPhase() {
-  const { players, me, roomCode, round, discussionTimer } = useGameState();
+  const { players, me, roomCode, round } = useGameState();
   const [ready, setReady] = useState(false);
-
+const shuffleSeed = useGameState(s => s.shuffleSeed);
   const myPlayer = players.find(p => p.id === me?.id);
   const amAlive = myPlayer?.alive;
   const aliveCount = players.filter(p => p.alive).length;
 
-  // Reset ready status if player dies during discussion
+  // Reset ready status when entering day phase or if player dies
+  useEffect(() => {
+    setReady(false);
+  }, [round]); // Reset when round changes (new day phase)
+
   useEffect(() => {
     if (!amAlive) {
       setReady(false);
@@ -33,14 +37,11 @@ export default function DayPhase() {
         <h2>Day {round}</h2>
         <p className="phase-description">Discuss who you think is mafia</p>
         <div className="player-count-display">{aliveCount} players alive</div>
-        {discussionTimer !== null && (
-          <div className="timer-display-center">
-            Voting in {discussionTimer}s
-          </div>
-        )}
       </div>
 
-      <PlayerGrid players={players} />
+
+<PlayerGrid players={players} shuffleSeed={shuffleSeed} />
+
 
       <div className="day-controls">
         {amAlive ? (

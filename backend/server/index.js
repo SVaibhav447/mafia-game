@@ -1,3 +1,4 @@
+const crypto = require("crypto");
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
@@ -47,6 +48,11 @@ function publicRoom(room) {
   };
 }
 
+
+function generateSeed() {
+  return crypto.randomInt(1, 2147483647); // nice safe 32-bit seed
+}
+
 // helper: broadcast to room
 function broadcast(room, event, payload) {
   io.to(room.roomCode).emit(event, payload);
@@ -57,6 +63,9 @@ io.on("connection", socket => {
   socket.on("createRoom", ({ roomCode, hostName }) => {
     const result = createRoom(roomCode, socket.id, hostName);
     if (result.error) return socket.emit("roomError", result.error);
+    result.room.shuffleSeed = generateSeed();
+  socket.emit("shuffleSeed", { shuffleSeed: result.room.shuffleSeed });
+
 
     socket.join(roomCode);
     socket.emit("youAre", { id: socket.id, name: hostName });
@@ -66,6 +75,8 @@ io.on("connection", socket => {
   socket.on("joinRoom", ({ roomCode, playerName }) => {
     const result = addPlayer(roomCode, socket.id, playerName);
     if (result.error) return socket.emit("roomError", result.error);
+    socket.emit("shuffleSeed", { shuffleSeed: result.room.shuffleSeed });
+
 
     socket.join(roomCode);
     socket.emit("youAre", { id: socket.id, name: playerName });
@@ -73,12 +84,14 @@ io.on("connection", socket => {
   });
 
   socket.on("startGame", ({ roomCode }) => {
+    
     const room = getRoom(roomCode);
     if (!room) return;
 
     if (socket.id !== room.hostId) {
       return socket.emit("roomError", "NOT_HOST");
     }
+    room.shuffleSeed = generateSeed();
 
     assignRoles(room);
 
@@ -98,7 +111,7 @@ io.on("connection", socket => {
 
     // public update (no roles during game) so clients have correct alive list/phase
     broadcast(room, "roomUpdate", publicRoom(room));
-
+    broadcast(room, "shuffleSeed", { shuffleSeed: room.shuffleSeed });
     startNight(room, io);
   });
 
@@ -176,6 +189,8 @@ io.on("connection", socket => {
   socket.on("resetGame", ({ roomCode }) => {
     const room = getRoom(roomCode);
     if (!room) return;
+     room.shuffleSeed = generateSeed();
+  broadcast(room, "shuffleSeed", { shuffleSeed: room.shuffleSeed });
 
     resetRoom(room, io);
   });
