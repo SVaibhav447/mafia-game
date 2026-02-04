@@ -2,7 +2,7 @@ import { io } from "socket.io-client";
 import { bindSocket, joinRoom, leaveRoom, startMic } from "./voice";
 import { useGameState } from "./state";
 
-export const gameSocket = io(import.meta.env.VITE_BACKEND_URL, {
+export const gameSocket = io(import.meta.env.VITE_BACKEND_URL || "http://localhost:3001", {
   transports: ["websocket"]
 });
 
