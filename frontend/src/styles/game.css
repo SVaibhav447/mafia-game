@@ -1,16 +1,32 @@
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
-.app {
-  width: 100vw;
-  min-height: 100svh; 
-min-height: 100dvh; 
+:root {
+  color-scheme: dark;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.5;
+}
 
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: #0b1120;
+  color: #f8fafc;
+}
+
+#root {
+  min-height: 100dvh;
+}
+
+.app {
+  width: 100%;
+  min-height: 100dvh;
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  color: white;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  overflow: hidden;
+  color: inherit;
+  overflow-x: hidden;
 }
 
 /* Player Grid */
@@ -22,7 +38,7 @@ min-height: 100dvh;
   max-width: 1400px;
   margin: 0 auto;
   overflow-y: auto;
-  max-height: calc(100vh - 340px);
+  max-height: calc(100dvh - 340px);
 }
 
 @media (min-width: 768px) {
@@ -138,6 +154,7 @@ min-height: 100dvh;
   z-index: 50;
   pointer-events: none;
   max-width: 600px;
+  width: calc(100% - 32px);
 }
 
 .night-header-center h2,
@@ -212,7 +229,7 @@ min-height: 100dvh;
   border: 2px solid rgba(148, 163, 184, 0.3);
   text-align: center;
   z-index: 100;
-  width: calc(100% - 24px);
+  width: min(640px, calc(100% - 24px));
   max-width: 640px;
 }
 
@@ -269,14 +286,38 @@ button:disabled {
   }
 }
 
+@media (max-width: 640px) {
+  .night-header-center,
+  .day-header-center,
+  .voting-header-center,
+  .night-overlay-center {
+    position: static;
+    transform: none;
+    margin: 24px auto 12px;
+    pointer-events: auto;
+  }
+
+  .night-phase,
+  .day-phase,
+  .voting-phase {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .player-grid {
+    padding: 0 16px 120px;
+    max-height: none;
+  }
+}
+
 /* Reveal Screens */
 .reveal-screen {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
-  min-height: 100svh; 
-min-height: 100dvh; 
+  min-height: 100dvh;
 
   background: rgba(0, 0, 0, 0.95);
   display: flex;
@@ -342,14 +383,32 @@ min-height: 100dvh;
   }
 }
 
+@media (max-width: 640px) {
+  .reveal-content {
+    padding: 24px;
+  }
+
+  .reveal-name {
+    font-size: 32px;
+    margin-bottom: 20px;
+  }
+
+  .reveal-alignment {
+    font-size: 28px;
+  }
+
+  .players-remaining {
+    font-size: 18px;
+  }
+}
+
 /* ========================================== */
 /* MODERN LOBBY DESIGN */
 /* ========================================== */
 
 .lobby-screen-modern {
   width: 100%;
-  min-min-height: 100svh; 
-min-height: 100dvh; 
+  min-height: 100dvh;
 
   display: flex;
   flex-direction: column;
@@ -726,6 +785,26 @@ min-height: 100dvh;
   }
 }
 
+@media (max-width: 640px) {
+  .lobby-screen-modern {
+    padding: 20px 14px 120px;
+  }
+
+  .lobby-room-badge {
+    padding: 10px 20px;
+  }
+
+  .lobby-roles-card {
+    padding: 20px;
+  }
+
+  .waiting-host-message {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+}
+
 /* Role Reveal Modal */
 .role-reveal-modal {
   position: fixed;
@@ -798,9 +877,23 @@ min-height: 100dvh;
   }
 }
 
+@media (max-width: 640px) {
+  .role-reveal-content {
+    padding: 32px 24px;
+    margin: 0 16px;
+  }
+
+  .role-reveal-modal .role-title {
+    font-size: 30px;
+  }
+
+  .role-reveal-modal .role-description {
+    font-size: 15px;
+  }
+}
+
 .lobby-setup {
-  min-min-height: 100svh; 
-min-height: 100dvh; 
+  min-height: 100dvh;
 
   width: 100%;
   display: flex;
@@ -926,8 +1019,7 @@ min-height: 100dvh;
 .night-phase,
 .day-phase,
 .voting-phase {
-  min-height: 100svh; 
-min-height: 100dvh; 
+  min-height: 100dvh;
 
   width: 100%;
 }
@@ -936,7 +1028,7 @@ min-height: 100dvh;
 @media (max-width: 768px) {
   .player-grid {
     padding: 150px 16px 140px;
-    max-height: calc(100vh - 290px);
+    max-height: calc(100dvh - 290px);
     gap: 14px;
   }
 }
@@ -944,7 +1036,7 @@ min-height: 100dvh;
 @media (max-width: 480px) {
   .player-grid {
     padding: 130px 12px 130px;
-    max-height: calc(100vh - 260px);
+    max-height: calc(100dvh - 260px);
     gap: 12px;
   }
 }
@@ -952,7 +1044,7 @@ min-height: 100dvh;
 @media (max-height: 700px) {
   .player-grid {
     padding: 120px 16px 120px;
-    max-height: calc(100vh - 240px);
+    max-height: calc(100dvh - 240px);
   }
 }
 
@@ -1002,8 +1094,7 @@ min-height: 100dvh;
 /* ========================================== */
 
 .endgame-screen {
-  min-height: 100svh; 
-min-height: 100dvh; 
+  min-height: 100dvh;
 
   width: 100%;
   display: flex;
