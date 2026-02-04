@@ -7,7 +7,7 @@ export default function NightPhase() {
   const { me, players, roomCode, round } = useGameState();
   const [selected, setSelected] = useState(null);
   const [submitted, setSubmitted] = useState(false);
-  const [nightTimer, setNightTimer] = useState(15);
+  const [nightTimer, setNightTimer] = useState(30);
 
   const myPlayer = players.find(p => p.id === me?.id);
   const amAlive = myPlayer?.alive;
