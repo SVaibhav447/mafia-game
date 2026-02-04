@@ -1,6 +1,12 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 .app {
   width: 100vw;
-  height: 100vh;
+  min-height: 100svh; 
+min-height: 100dvh; 
+
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
   color: white;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -269,7 +275,9 @@ button:disabled {
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100vh;
+  min-height: 100svh; 
+min-height: 100dvh; 
+
   background: rgba(0, 0, 0, 0.95);
   display: flex;
   align-items: center;
@@ -340,7 +348,9 @@ button:disabled {
 
 .lobby-screen-modern {
   width: 100%;
-  min-height: 100vh;
+  min-min-height: 100svh; 
+min-height: 100dvh; 
+
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -722,7 +732,9 @@ button:disabled {
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100vh;
+  min-height: 100svh; 
+min-height: 100dvh; 
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -787,7 +799,9 @@ button:disabled {
 }
 
 .lobby-setup {
-  min-height: 100vh;
+  min-min-height: 100svh; 
+min-height: 100dvh; 
+
   width: 100%;
   display: flex;
   align-items: center;
@@ -912,7 +926,9 @@ button:disabled {
 .night-phase,
 .day-phase,
 .voting-phase {
-  height: 100vh;
+  min-height: 100svh; 
+min-height: 100dvh; 
+
   width: 100%;
 }
 
@@ -986,7 +1002,9 @@ button:disabled {
 /* ========================================== */
 
 .endgame-screen {
-  height: 100vh;
+  min-height: 100svh; 
+min-height: 100dvh; 
+
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -1062,5 +1080,10 @@ button:disabled {
   .play-again-button {
     width: 100%;
     max-width: 420px;
+  }
+}
+@media (max-height: 700px) {
+  .lobby-screen-modern {
+    padding-bottom: 160px;
   }
 }

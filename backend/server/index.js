@@ -23,7 +23,11 @@ app.use(cors());
 
 const server = http.createServer(app);
 const io = new Server(server, {
-  cors: { origin: "*" }
+  cors: { origin: [
+    "http://localhost:3000",
+    "https://mafia-game-frontend.vercel.app"
+  ],
+    methods: ["GET", "POST"]}
 });
 
 registerVoice(io);
@@ -187,9 +191,9 @@ io.on("connection", socket => {
   });
 
 });
-
-server.listen(3001, () => {
-  console.log("Game backend running on port 3001");
-  // console.log("Player" ${playerName} "joined room" ${roomcode})
+const PORT = process.env.PORT || 3001;
+server.listen(PORT, () => {
+  console.log(`Game backend running on port ${PORT}`);
+  
 
 });
