@@ -7,7 +7,7 @@ export default function VotingPhase() {
   const { players, me, roomCode } = useGameState();
   const [selected, setSelected] = useState(null);
   const [voted, setVoted] = useState(false);
-  const [votingTimer, setVotingTimer] = useState(45);
+  const [votingTimer, setVotingTimer] = useState(30);
 
   const myPlayer = players.find(p => p.id === me?.id);
   const amAlive = myPlayer?.alive;
