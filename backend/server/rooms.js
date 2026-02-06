@@ -1,12 +1,14 @@
 const rooms = {};
 const crypto = require("crypto");
 
-function createRoom(roomCode, hostId, hostName) {
+function createRoom(roomCode, hostSocketId, hostName, hostPlayerId) {
   if (rooms[roomCode]) return { error: "ROOM_EXISTS" };
+
+  const playerId = hostPlayerId || crypto.randomUUID();
 
   rooms[roomCode] = {
     roomCode,
-    hostId,
+    hostId: playerId,
     status: "lobby",
     players: [],
     shuffleSeed: crypto.randomInt(1, 2147483647),
@@ -20,15 +22,19 @@ function createRoom(roomCode, hostId, hostName) {
     }
   };
 
-  rooms[roomCode].players.push({
-    id: hostId,
+  const host = {
+    id: playerId,
+    socketId: hostSocketId,
     name: hostName,
     alive: true,
     role: null,
+    connected: true,
     healedSelf: false
-  });
+  };
 
-  return { room: rooms[roomCode] };
+  rooms[roomCode].players.push(host);
+
+  return { room: rooms[roomCode], player: host };
 }
 
 function getRoom(code) {

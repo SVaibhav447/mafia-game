@@ -1,4 +1,4 @@
-const resolveNight = (room) => {
+const endNight = (room) => {
   const mafiaKill = room.state.mafiaTarget;   // playerId
   const doctorSave = room.state.doctorTarget; // playerId
 
@@ -24,4 +24,4 @@ const resolveNight = (room) => {
   return { killed, prevented };
 };
 
-module.exports = { resolveNight };
+module.exports = { endNight };

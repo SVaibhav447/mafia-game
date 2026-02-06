@@ -1,23 +1,40 @@
 
-const { getRoom, deleteRoom, allRooms } = require("./rooms");
+const crypto = require("crypto");
+const { getRoom, allRooms } = require("./rooms");
 
-function addPlayer(roomCode, playerId, playerName) {
+function addPlayer(roomCode, socketId, playerName, playerId) {
   const room = getRoom(roomCode);
   if (!room) return { error: "ROOM_NOT_FOUND" };
 
-  const exists = room.players.some(p => p.id === playerId);
-  if (!exists) {
-    room.players.push({
-      id: playerId,
-      name: playerName,
-      alive: true,
-      role: null,
-      healedSelf: false,
-      
-    });
-   
+  if (playerId) {
+    const existing = room.players.find(p => p.id === playerId);
+    if (existing) {
+      if (existing.connected && existing.socketId && existing.socketId !== socketId) {
+        return { error: "PLAYER_ALREADY_CONNECTED" };
+      }
+      existing.socketId = socketId;
+      existing.name = playerName;
+      existing.connected = true;
+      return { room, player: existing, reconnected: true };
+    }
   }
-  return { room };
+
+  if (room.state?.phase !== "lobby") {
+    return { error: "GAME_IN_PROGRESS" };
+  }
+
+  const newPlayer = {
+    id: playerId || crypto.randomUUID(),
+    socketId,
+    name: playerName,
+    alive: true,
+    role: null,
+    connected: true,
+    healedSelf: false
+  };
+
+  room.players.push(newPlayer);
+  return { room, player: newPlayer };
 }
 
 function removePlayer(playerId) {
@@ -25,16 +42,12 @@ function removePlayer(playerId) {
   
   for (const code in allRoomsObj) {
     const room = allRoomsObj[code];
-    const idx = room.players.findIndex(p => p.id === playerId);
+    const idx = room.players.findIndex(p => p.socketId === playerId);
     
     if (idx !== -1) {
-      room.players.splice(idx, 1);
-      
-      if (room.players.length === 0) {
-        deleteRoom(code);
-        return { removed: true, roomCode: null };
-      }
-      
+      room.players[idx].connected = false;
+      room.players[idx].socketId = null;
+
       return { removed: true, roomCode: code };
     }
   }

@@ -4,7 +4,7 @@ import { gameSocket } from "../core/socket";
 import PlayerGrid from "../components/PlayerGrid";
 
 export default function NightPhase() {
-  const { me, players, roomCode, round } = useGameState();
+  const { me, players, roomCode, round, nightEndsAt } = useGameState();
   const [selected, setSelected] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const [nightTimer, setNightTimer] = useState(30);
@@ -12,20 +12,23 @@ export default function NightPhase() {
   const myPlayer = players.find(p => p.id === me?.id);
   const amAlive = myPlayer?.alive;
   const myRole = me?.role;
+  const canAct = myRole === "mafia" || myRole === "doctor";
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setNightTimer(prev => {
-        if (prev <= 1) {
-          clearInterval(interval);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+    function updateTimer() {
+      if (!nightEndsAt) {
+        setNightTimer(30);
+        return;
+      }
+      const remainingMs = nightEndsAt - Date.now();
+      const remaining = Math.max(0, Math.ceil(remainingMs / 1000));
+      setNightTimer(remaining);
+    }
 
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [nightEndsAt]);
 
   function handlePlayerClick(player) {
     if (submitted || !amAlive) return;
@@ -56,7 +59,7 @@ export default function NightPhase() {
   }
 
   // Dead players or civilians just watch
-  if (!amAlive || myRole === "civilian") {
+  if (!amAlive || !canAct) {
     return (
       <div className="night-phase">
         <div className="night-overlay-center">
@@ -98,7 +101,7 @@ export default function NightPhase() {
           disabled={!selected || submitted}
           className="submit-action-button"
         >
-          {submitted ? "Action Submitted ✓" : "Confirm"}
+          {submitted ? "ACTION CONFIRMED" : myRole === "mafia" ? "KILL" : "HEAL"}
         </button>
       </div>
     </div>

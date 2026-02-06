@@ -17,7 +17,15 @@ function publicRoom(room) {
       alive: !!p.alive,
       ...(includeRoles ? { role: p.role } : {})
     })),
-    state: room.state ? { phase: room.state.phase, round: room.state.round } : null
+    state: room.state
+      ? {
+          phase: room.state.phase,
+          round: room.state.round,
+          nightEndsAt: room.state.nightEndsAt || null,
+          discussionEndsAt: room.state.discussionEndsAt || null,
+          votingEndsAt: room.state.votingEndsAt || null
+        }
+      : null
   };
 }
 
@@ -25,9 +33,16 @@ function startNight(room, io) {
   room.state.phase = "night";
   room.state.mafiaTarget = null;
   room.state.doctorTarget = null;
+  room.state.mafiaSubmitted = false;
+  room.state.doctorSubmitted = false;
+  room.state.nightEndsAt = Date.now() + 30000;
   // DON'T increment round here
 
-  broadcast(room, io, "phaseChange", { phase: "night", round: room.state.round });
+  broadcast(room, io, "phaseChange", { 
+    phase: "night", 
+    round: room.state.round,
+    nightEndsAt: room.state.nightEndsAt
+  });
 
   room.state.nightTimeout = setTimeout(() => {
     endNight(room, io);
@@ -75,6 +90,7 @@ function startDayReveal(room, io, resolution) {
   const { killed, prevented } = resolution;
 
   room.state.phase = "dayReveal";
+  room.state.nightEndsAt = null;
   // broadcast updated alive list immediately (no roles leaked)
   broadcast(room, io, "roomUpdate", publicRoom(room));
   broadcast(room, io, "phaseChange", { phase: "dayReveal" });
@@ -114,6 +130,8 @@ function startDay(room, io) {
   room.state.phase = "day";
   room.state.ready = new Set();
   room.state.discussionTimeout = null;
+  room.state.discussionEndsAt = null;
+  room.state.votingEndsAt = null;
 
   broadcast(room, io, "phaseChange", { phase: "day", round: room.state.round });
   broadcast(room, io, "discussionStart", {});
@@ -123,8 +141,10 @@ function startVoting(room, io) {
   clearTimeout(room.state.discussionTimeout);
   room.state.phase = "voting";
   room.state.votes = {};
+  room.state.discussionEndsAt = null;
+  room.state.votingEndsAt = Date.now() + 45000;
 
-  broadcast(room, io, "phaseChange", { phase: "voting" });
+  broadcast(room, io, "phaseChange", { phase: "voting", votingEndsAt: room.state.votingEndsAt });
   broadcast(room, io, "votingStart", {});
 
   room.state.voteTimeout = setTimeout(() => {
@@ -135,6 +155,7 @@ function startVoting(room, io) {
 function finishVoting(room, io) {
   if (room.state.phase !== "voting") return;
   clearTimeout(room.state.voteTimeout);
+  room.state.votingEndsAt = null;
 
   room.state.phase = "lynchReveal";
   broadcast(room, io, "phaseChange", { phase: "lynchReveal" });
@@ -214,6 +235,11 @@ function resetRoom(room, io) {
     round: 0,
     mafiaTarget: null,
     doctorTarget: null,
+    nightEndsAt: null,
+    mafiaSubmitted: false,
+    doctorSubmitted: false,
+    discussionEndsAt: null,
+    votingEndsAt: null,
     votes: {},
     ready: new Set()
   };

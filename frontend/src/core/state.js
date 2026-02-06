@@ -12,6 +12,9 @@ export const useGameState = create((set, get) => ({
   roomCode: null,
   round: 0,
   shuffleSeed: null,
+  nightEndsAt: null,
+  discussionEndsAt: null,
+  votingEndsAt: null,
   discussionTimer: null,
   showRoleScreen: false,
   dayResult: null,
@@ -31,7 +34,7 @@ export const useGameState = create((set, get) => ({
 gameSocket.on("youAre", ({ id, name }) => {
   const g = useGameState.getState();
   useGameState.setState({ 
-    me: { ...g.me, id, name }
+    me: { ...(g.me || {}), id, name }
   });
 });
 
@@ -44,6 +47,7 @@ gameSocket.on("shuffleSeed", ({ shuffleSeed }) => {
 gameSocket.on("roomUpdate", (room) => {
   const g = useGameState.getState();
   const my = g.me?.id ? room.players?.find(p => p.id === g.me.id) : null;
+  const nextMe = g.me ? { ...g.me, alive: my?.alive } : g.me;
 
   useGameState.setState({
     players: room.players,
@@ -51,9 +55,16 @@ gameSocket.on("roomUpdate", (room) => {
     roomCode: room.roomCode,
     phase: room.state?.phase ?? g.phase,
     round: room.state?.round ?? g.round,
+    nightEndsAt: room.state?.nightEndsAt ?? g.nightEndsAt,
+    discussionEndsAt: room.state?.discussionEndsAt ?? g.discussionEndsAt,
+    votingEndsAt: room.state?.votingEndsAt ?? g.votingEndsAt,
     discussionTimer: null,
-    me: g.me ? { ...g.me, alive: my?.alive } : g.me
+    me: nextMe
   });
+
+  if (nextMe?.id && room.roomCode) {
+    sessionStorage.setItem(`mafiaPlayerId:${room.roomCode}`, nextMe.id);
+  }
 });
 
 gameSocket.on("roleReveal", ({ role }) => {
@@ -67,7 +78,7 @@ gameSocket.on("roleReveal", ({ role }) => {
   }, 4000);
 });
 
-gameSocket.on("phaseChange", ({ phase, round, day }) => {
+gameSocket.on("phaseChange", ({ phase, round, day, nightEndsAt, discussionEndsAt, votingEndsAt }) => {
   console.log("Phase change:", phase, round, day);
   const g = useGameState.getState();
   
@@ -75,7 +86,10 @@ gameSocket.on("phaseChange", ({ phase, round, day }) => {
   const updates = { 
     phase, 
     round: (round ?? day ?? g.round), 
-    discussionTimer: null 
+    discussionTimer: null,
+    nightEndsAt: nightEndsAt ?? (phase === "night" ? g.nightEndsAt : null),
+    discussionEndsAt: discussionEndsAt ?? (phase === "day" ? g.discussionEndsAt : null),
+    votingEndsAt: votingEndsAt ?? (phase === "voting" ? g.votingEndsAt : null)
   };
   
   // Clear day result when leaving dayReveal phase

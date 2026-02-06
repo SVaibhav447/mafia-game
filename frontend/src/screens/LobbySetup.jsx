@@ -18,9 +18,12 @@ export default function LobbySetup() {
     }
     
     setError("");
+    const normalized = roomCode.trim().toUpperCase();
+    const storedId = sessionStorage.getItem(`mafiaPlayerId:${normalized}`);
     gameSocket.emit("createRoom", { 
-      roomCode: roomCode.trim().toUpperCase(), 
-      hostName: name.trim() 
+      roomCode: normalized, 
+      hostName: name.trim(),
+      playerId: storedId || undefined
     });
   }
 
@@ -35,9 +38,12 @@ export default function LobbySetup() {
     }
     
     setError("");
+    const normalized = roomCode.trim().toUpperCase();
+    const storedId = sessionStorage.getItem(`mafiaPlayerId:${normalized}`);
     gameSocket.emit("joinRoom", { 
-      roomCode: roomCode.trim().toUpperCase(), 
-      playerName: name.trim() 
+      roomCode: normalized, 
+      playerName: name.trim(),
+      playerId: storedId || undefined
     });
   }
 

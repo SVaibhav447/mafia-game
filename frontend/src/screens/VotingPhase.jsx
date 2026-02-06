@@ -4,7 +4,7 @@ import { gameSocket } from "../core/socket";
 import PlayerGrid from "../components/PlayerGrid";
 
 export default function VotingPhase() {
-  const { players, me, roomCode } = useGameState();
+  const { players, me, roomCode, votingEndsAt } = useGameState();
   const [selected, setSelected] = useState(null);
   const [voted, setVoted] = useState(false);
   const [votingTimer, setVotingTimer] = useState(45);
@@ -14,18 +14,20 @@ export default function VotingPhase() {
   const aliveCount = players.filter(p => p.alive).length;
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setVotingTimer(prev => {
-        if (prev <= 1) {
-          clearInterval(interval);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+    function updateTimer() {
+      if (!votingEndsAt) {
+        setVotingTimer(45);
+        return;
+      }
+      const remainingMs = votingEndsAt - Date.now();
+      const remaining = Math.max(0, Math.ceil(remainingMs / 1000));
+      setVotingTimer(remaining);
+    }
 
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [votingEndsAt]);
 
   // Reset vote if player dies during voting
   useEffect(() => {

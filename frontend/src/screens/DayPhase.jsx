@@ -4,9 +4,10 @@ import { gameSocket } from "../core/socket";
 import PlayerGrid from "../components/PlayerGrid";
 
 export default function DayPhase() {
-  const { players, me, roomCode, round } = useGameState();
+  const { players, me, roomCode, round, discussionEndsAt } = useGameState();
   const [ready, setReady] = useState(false);
-const shuffleSeed = useGameState(s => s.shuffleSeed);
+  const [discussionTimer, setDiscussionTimer] = useState(null);
+  const shuffleSeed = useGameState(s => s.shuffleSeed);
   const myPlayer = players.find(p => p.id === me?.id);
   const amAlive = myPlayer?.alive;
   const aliveCount = players.filter(p => p.alive).length;
@@ -21,6 +22,22 @@ const shuffleSeed = useGameState(s => s.shuffleSeed);
       setReady(false);
     }
   }, [amAlive]);
+
+  useEffect(() => {
+    function updateTimer() {
+      if (!discussionEndsAt) {
+        setDiscussionTimer(null);
+        return;
+      }
+      const remainingMs = discussionEndsAt - Date.now();
+      const remaining = Math.max(0, Math.ceil(remainingMs / 1000));
+      setDiscussionTimer(remaining);
+    }
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+    return () => clearInterval(interval);
+  }, [discussionEndsAt]);
 
   function handleReady() {
     if (!amAlive || ready) return;
@@ -37,6 +54,9 @@ const shuffleSeed = useGameState(s => s.shuffleSeed);
         <h2>Day {round}</h2>
         <p className="phase-description">Discuss who you think is mafia</p>
         <div className="player-count-display">{aliveCount} players alive</div>
+        {discussionTimer !== null && (
+          <div className="timer-display-center">{discussionTimer}s</div>
+        )}
       </div>
 
 
